@@ -1,5 +1,6 @@
 /*
- * Copyright 2010, 2011, 2012 mapsforge.org
+ * Copyright 2010, 2011, 2012, 2013 mapsforge.org
+ * Copyright 2017 devemux86
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -12,18 +13,16 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.ikroshlab.vtmexample.filepicker;
+package com.ikroshlab.ovtencoder;
 
-import org.oscim.tiling.TileSource.OpenResult;
+import java.util.List;
 
-import java.io.FileFilter;
+public class PoiWayBundle {
+    final List<PointOfInterest> pois;
+    final List<Way> ways;
 
-/**
- * An extension of the {@link FileFilter} interface.
- */
-public interface ValidFileFilter extends FileFilter {
-    /**
-     * @return the result of the last {@link #accept} call (might be null).
-     */
-    OpenResult getFileOpenResult();
+    public PoiWayBundle(List<PointOfInterest> pois, List<Way> ways) {
+        this.pois = pois;
+        this.ways = ways;
+    }
 }

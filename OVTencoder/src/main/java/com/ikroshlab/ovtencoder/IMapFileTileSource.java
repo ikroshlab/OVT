@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, 2011, 2012 mapsforge.org
+ * Copyright 2016 devemux86
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -12,18 +12,11 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.ikroshlab.vtmexample.filepicker;
+package com.ikroshlab.ovtencoder;
 
-import org.oscim.tiling.TileSource.OpenResult;
+public interface IMapFileTileSource {
 
-import java.io.FileFilter;
+    void setCallback(MapFileTileSource.Callback callback);
 
-/**
- * An extension of the {@link FileFilter} interface.
- */
-public interface ValidFileFilter extends FileFilter {
-    /**
-     * @return the result of the last {@link #accept} call (might be null).
-     */
-    OpenResult getFileOpenResult();
+    void setPreferredLanguage(String preferredLanguage);
 }

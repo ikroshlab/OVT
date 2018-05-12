@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 
     <application
@@ -25,22 +26,17 @@
         <activity android:name="com.ikroshlab.vtmexample.test.MapsforgeMapActivity$MapFilePicker" />
 
         <activity
-            android:name="com.ikroshlab.vtmexample.test.BitmapTileMapActivity"
-            android:label="@string/title_activity_map" >
-        </activity>
-
-        <activity
             android:name="com.ikroshlab.vtmexample.test.MapsforgeMapActivity"
             android:label="@string/title_activity_map" >
         </activity>
 
         <activity
-            android:name="com.ikroshlab.vtmexample.test.ThemeStylerActivity"
+            android:name="com.ikroshlab.vtmexample.test.ForgeOnlineMapActivity"
             android:label="@string/title_activity_map" >
         </activity>
 
         <activity
-            android:name="com.ikroshlab.vtmexample.test.ForgeOnlineMapActivity"
+            android:name="com.ikroshlab.vtmexample.test.LocationActivity"
             android:label="@string/title_activity_map" >
         </activity>
 

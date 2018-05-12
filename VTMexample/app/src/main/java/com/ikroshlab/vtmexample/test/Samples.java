@@ -38,6 +38,11 @@ import android.widget.LinearLayout;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * A simple start screen for the sample activities.
@@ -66,8 +71,6 @@ public class Samples extends AppCompatActivity {
         logDebug("Samples - activate()");
 
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.samples);
-        linearLayout.addView(createButton(BitmapTileMapActivity.class, "Raster maps"));
-        linearLayout.addView(createButton(ThemeStylerActivity.class, "VTM styled online maps"));
         linearLayout.addView(createButton(MapsforgeMapActivity.class, "MapsForge offline maps"));
         linearLayout.addView(createButton(ForgeOnlineMapActivity.class, "MapsForge online maps"));
     }
@@ -101,86 +104,64 @@ public class Samples extends AppCompatActivity {
     ///////////////////////////////// handling runtime permissions  ////////////////////////////////
     private void getPermissions() {
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
+        List<String> permissions = new ArrayList<>();
 
-            //logDebug("permission has NOT been granted yet.");
-            requestWritePermission();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);    // not granted yet
         }
-        else {
-            //logDebug("permission has already been granted");
-            try {
-                activate();
-            } catch (RuntimeException e)  {  ; }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);  // not granted yet
+        }
+        if (!permissions.isEmpty()) {    // not all permissions have been granted yet
+            String[] params = permissions.toArray(new String[permissions.size()]);
+            requestPermissions(params, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
 
+            return;
         }
+
+        // We already have permissions, so handle as normal
+        activate();
 
     }  // end getPermissions()
 
 
-    private void requestWritePermission() {
 
-        // Should we show an explanation?
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
-        {
-            //logDebug("We need to show an explanation to be granted with the permission");
-            // Show an explanation to the user *asynchronously* -- don't block this thread waiting for the user's response!
-            // After the user sees the explanation, try again to request the permission.
-            AlertDialog.Builder bld = new AlertDialog.Builder(this);
-            bld.setMessage("Write_permission_rationale");
-            bld.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface d, int i) {
-                    ActivityCompat.requestPermissions(Samples.this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-                }
-            });
-            bld.setCancelable(false);
-            bld.create().show();
-
-        }
-        else { // No explanation needed, we can request the permission.
-            //logDebug("No explanation needed, we can request the permission.");
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-
-            // The callback method gets the result of the request...
-        }
-
-    }  // end requestLocationPermission()
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the permission-related task you need to do.
-                    logDebug("Permission was granted by the user.");
-                    try {
-                        activate();
-                    } catch (RuntimeException e)  {  ;  }
+                Map<String, Integer> perms = new HashMap<>();
+
+                // Initial
+                perms.put(Manifest.permission.ACCESS_FINE_LOCATION,   PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
+
+                // Fill with results
+                for (int i = 0; i < permissions.length; i++)
+                    perms.put(permissions[i], grantResults[i]);
+
+                // Check for ACCESS_FINE_LOCATION and WRITE_EXTERNAL_STORAGE
+                Boolean location = perms.get(Manifest.permission.ACCESS_FINE_LOCATION)   == PackageManager.PERMISSION_GRANTED;
+                Boolean storage  = perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+
+                if (location && storage) {  // All Permissions Granted
+
+                    activate();
+                    //permissionsGrantedListener.onPermissionsGranted(true);
                 }
                 else {
-                    // permission denied, boo! Disable the functionality that depends on this permission.
-                    logDebug("Permission was denied by the user.");
-                    Toast.makeText(Samples.this, "Cannot start - no permission", Toast.LENGTH_LONG).show();
 
-                    this.finish();
+                    //permissionsGrantedListener.onPermissionsGranted(false);
                 }
             }
+            break;
 
-            // other 'case' lines to check for other permissions this app might request
-
-            default:  {
+            default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-            }
         }
-
-    }  // end onRequestPermissionsResult()
+    } // end onRequestPermissionsResult()
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
 

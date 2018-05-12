@@ -1,5 +1,7 @@
 /*
  * Copyright 2010, 2011, 2012 mapsforge.org
+ * Copyright 2016-2017 devemux86
+ * Copyright 2017 Longri
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -14,58 +16,48 @@
  */
 package com.ikroshlab.vtmexample.filepicker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
-
+import org.oscim.theme.ExternalRenderTheme;
+import org.oscim.theme.ThemeFile;
+import org.oscim.theme.ThemeUtils;
+import org.oscim.theme.XmlMapsforgeThemeBuilder;
 import org.oscim.theme.XmlThemeBuilder;
 import org.oscim.tiling.TileSource.OpenResult;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.File;
+
+import javax.xml.parsers.SAXParserFactory;
 
 /**
  * Accepts all valid render theme XML files.
  */
 public final class ValidRenderTheme implements ValidFileFilter {
-	private OpenResult mOpenResult;
+    private OpenResult mOpenResult;
 
-	@Override
-	public boolean accept(File file) {
-		InputStream inputStream = null;
+    @Override
+    public boolean accept(File file) {
 
-		try {
-			inputStream = new FileInputStream(file);
-			XmlThemeBuilder renderThemeHandler = new XmlThemeBuilder();
-			XMLReader xmlReader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
-			xmlReader.setContentHandler(renderThemeHandler);
-			xmlReader.parse(new InputSource(inputStream));
-			mOpenResult = OpenResult.SUCCESS;
-		} catch (ParserConfigurationException e) {
-			mOpenResult = new OpenResult(e.getMessage());
-		} catch (SAXException e) {
-			mOpenResult = new OpenResult(e.getMessage());
-		} catch (IOException e) {
-			mOpenResult = new OpenResult(e.getMessage());
-		} finally {
-			try {
-				if (inputStream != null) {
-					inputStream.close();
-				}
-			} catch (IOException e) {
-				mOpenResult = new OpenResult(e.getMessage());
-			}
-		}
+        try {
+            ThemeFile theme = new ExternalRenderTheme(file.getAbsolutePath());
+            DefaultHandler renderThemeHandler;
+            if (ThemeUtils.isMapsforgeTheme(theme))
+                renderThemeHandler = new XmlMapsforgeThemeBuilder(theme);
+            else
+                renderThemeHandler = new XmlThemeBuilder(theme);
+            XMLReader xmlReader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
+            xmlReader.setContentHandler(renderThemeHandler);
+            xmlReader.parse(new InputSource(theme.getRenderThemeAsStream()));
+            mOpenResult = OpenResult.SUCCESS;
+        } catch (Exception e) {
+            mOpenResult = new OpenResult(e.getMessage());
+        }
+        return mOpenResult.isSuccess();
+    }
 
-		return mOpenResult.isSuccess();
-	}
-
-	@Override
-	public OpenResult getFileOpenResult() {
-		return mOpenResult;
-	}
+    @Override
+    public OpenResult getFileOpenResult() {
+        return mOpenResult;
+    }
 }
