@@ -8,12 +8,12 @@ There are two projects:
 
    - VTMencoder: this is an example of code to show how to encode map tiles from Mapsforge original map file to a byte array.
      This byte array can be put further into a database or so.
-     This project keep reference to VTM_0.9.2 as a Maven dependency. 
+     This project keeps reference to VTM_0.9.2 as a Maven dependency. 
      This project is developed under NetBeans, pure Java SE. 
 
    - VTMexample: this is the client part for the VTMencoder - it demonstrates how to get map tiles from online datasource using
      the ForgeOnlineTileSource.class and decode them.
-     This project keep reference to VTM_0.9.2 as a Gradle dependency. 
+     This project keeps reference to VTM_0.9.2 as a Gradle dependency. 
      This project is developed under Android Studio, min sdk version 23.
      
 The underground problem is now largely discussed on https://groups.google.com/forum/#!topic/mapsforge-dev/YPUd-9zfPuU 
